@@ -105,7 +105,6 @@ echo '
         .square {
             width: 50px;
             height: 50px;
-            background-color: ' . $color1 . ';
             margin: 0 10px;
         }
     </style>
