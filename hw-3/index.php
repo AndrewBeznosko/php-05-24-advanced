@@ -2,7 +2,7 @@
 
 /**
  * To test the code, open:
- * http://localhost:8082/hw-3.php
+ * http://localhost:8082/hw-3
  */
 class ValueObject
 {
