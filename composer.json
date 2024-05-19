@@ -1,0 +1,17 @@
+{
+  "name": "root/html",
+  "type": "project",
+  "authors": [
+    {
+      "name": "Andrew"
+    }
+  ],
+  "require": {
+    "larapack/dd": "^1.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Overload\\": "Classes/"
+    }
+  }
+}
