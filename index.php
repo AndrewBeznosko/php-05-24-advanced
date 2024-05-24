@@ -1,16 +1,11 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
 
-use Overload\User;
+$dsn = 'mysql:host=database;dbname=php_05_advanced';
 
 try {
-    $user = new User('Andrew', 25, 'andrew@test.com');
-
-    // This will show the user's information
-    d($user->getAll());
-
-    // This will throw an exception
-    $user->getInfo();
-} catch (Exception $e) {
-    echo $e->getMessage();
+    $pdo = new PDO($dsn, 'root', 'secret');
+    echo "Connection successful!";
+} catch (PDOException $e) {
+    echo "Connection failed: " . $e->getMessage();
 }
