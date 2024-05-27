@@ -3,12 +3,12 @@
 // HW 8. Open/Closed Principle
 interface Delivery
 {
-    public function deliver($format): void;
+    public function deliver(string $format): void;
 }
 
 class EmailDelivery implements Delivery
 {
-    public function deliver($format): void
+    public function deliver(string $format): void
     {
         echo "Вывод формата ({$format}) по имейл";
     }
@@ -16,7 +16,7 @@ class EmailDelivery implements Delivery
 
 class SmsDelivery implements Delivery
 {
-    public function deliver($format): void
+    public function deliver(string $format): void
     {
         echo "Вывод формата ({$format}) в смс";
     }
@@ -24,7 +24,7 @@ class SmsDelivery implements Delivery
 
 class ConsoleDelivery implements Delivery
 {
-    public function deliver($format): void
+    public function deliver(string $format): void
     {
         echo "Вывод формата ({$format}) в консоль";
     }
