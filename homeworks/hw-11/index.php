@@ -1,5 +1,7 @@
 <?php
 
+// HW 11. Factory Method
+// http://localhost:8082/homeworks/hw-11
 abstract class TaxiFactory
 {
     abstract public function getTaxi(): Taxi;
@@ -7,8 +9,8 @@ abstract class TaxiFactory
     public function showTaxiInfo(): void
     {
         $taxi = $this->getTaxi();
-        echo 'Taxi model: ' . $taxi->carModel() . PHP_EOL;
-        echo 'Taxi price: ' . $taxi->price() . PHP_EOL;
+        echo 'Taxi model: <b>' . $taxi->carModel() . '</b><br>';
+        echo 'Taxi price: <b>' . $taxi->price() . '</b><br>';
     }
 }
 
@@ -83,6 +85,6 @@ class LuxuryTaxi implements Taxi
 }
 
 // Output:
-echo 'Economy taxi info:' . PHP_EOL;
+echo 'Economy taxi info:' . '<br>';
 $economyTaxi = new EconomyTaxiFactory();
 $economyTaxi->showTaxiInfo();
