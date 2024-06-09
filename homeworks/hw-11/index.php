@@ -4,7 +4,7 @@ abstract class TaxiFactory
 {
     abstract public function getTaxi(): Taxi;
 
-    public function showTaxiInfo()
+    public function showTaxiInfo(): void
     {
         $taxi = $this->getTaxi();
         echo 'Taxi model: ' . $taxi->carModel() . PHP_EOL;
