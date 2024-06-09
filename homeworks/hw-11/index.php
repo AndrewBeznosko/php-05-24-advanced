@@ -1,49 +1,49 @@
 <?php
 
-abstract class Delivery
+abstract class TaxiFactory
 {
-    abstract public function getDeliveryCar(): DeliveryCar;
+    abstract public function getTaxi(): Taxi;
 
-    public function showDeliveryInfo()
+    public function showTaxiInfo()
     {
-        $deliveryCar = $this->getDeliveryCar();
-        echo 'Delivery car model: ' . $deliveryCar->carModel() . PHP_EOL;
-        echo 'Delivery price: ' . $deliveryCar->price() . PHP_EOL;
+        $taxi = $this->getTaxi();
+        echo 'Taxi model: ' . $taxi->carModel() . PHP_EOL;
+        echo 'Taxi price: ' . $taxi->price() . PHP_EOL;
     }
 }
 
-class EconomyDelivery extends Delivery
+class EconomyTaxiFactory extends TaxiFactory
 {
-    public function getDeliveryCar(): DeliveryCar
+    public function getTaxi(): Taxi
     {
-        return new EconomyCar();
+        return new EconomyTaxi();
     }
 }
 
-class RegularDelivery extends Delivery
+class RegularTaxiFactory extends TaxiFactory
 {
-    public function getDeliveryCar(): DeliveryCar
+    public function getTaxi(): Taxi
     {
-        return new RegularCar();
+        return new RegularTaxi();
     }
 }
 
-class LuxuryDelivery extends Delivery
+class LuxuryTaxiFactory extends TaxiFactory
 {
-    public function getDeliveryCar(): DeliveryCar
+    public function getTaxi(): Taxi
     {
-        return new LuxuryCar();
+        return new LuxuryTaxi();
     }
 }
 
-interface DeliveryCar
+interface Taxi
 {
     public function price(): int;
 
     public function carModel(): string;
 }
 
-class EconomyCar implements DeliveryCar
+class EconomyTaxi implements Taxi
 {
     public function price(): int
     {
@@ -56,7 +56,7 @@ class EconomyCar implements DeliveryCar
     }
 }
 
-class RegularCar implements DeliveryCar
+class RegularTaxi implements Taxi
 {
     public function price(): int
     {
@@ -69,7 +69,7 @@ class RegularCar implements DeliveryCar
     }
 }
 
-class LuxuryCar implements DeliveryCar
+class LuxuryTaxi implements Taxi
 {
     public function price(): int
     {
@@ -83,6 +83,6 @@ class LuxuryCar implements DeliveryCar
 }
 
 // Output:
-echo 'Economy delivery info:' . PHP_EOL;
-$economyDelivery = new EconomyDelivery();
-$economyDelivery->showDeliveryInfo();
+echo 'Economy taxi info:' . PHP_EOL;
+$economyTaxi = new EconomyTaxiFactory();
+$economyTaxi->showTaxiInfo();
