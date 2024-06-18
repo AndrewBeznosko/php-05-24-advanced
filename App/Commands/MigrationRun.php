@@ -1,46 +1,107 @@
-#!/usr/local/bin/php
 <?php
-const BASE_DIR = __DIR__;
 
-require BASE_DIR . '/vendor/autoload.php';
+namespace App\Commands;
 
-use App\Commands\Command;
-use App\Commands\MigrationCreate;
-use App\Commands\MigrationRun;
-use Dotenv\Dotenv;
-use splitbrain\phpcli\CLI;
-use splitbrain\phpcli\Options;
+use CliHelper;
+use PDOException;
+use splitbrain\phpcli\Exception;
 
-class CliHelper extends CLI
+class MigrationRun implements Command
 {
-    // register options and arguments
-    protected function setup(Options $options)
-    {
-        $options->registerCommand('migration:create', 'Create migration file');
-        $options->registerArgument('name', 'Migration file name', true, 'migration:create');
-        $options->registerCommand('migration:run', 'Run all migration files');
+    const MIGRATIONS_DIR = BASE_DIR . '/migrations';
 
-        $dotenv = Dotenv::createUnsafeImmutable(BASE_DIR);
-        $dotenv->load();
+    public function __construct(public CliHelper $cliHelper, public array $args = [])
+    {
     }
 
-    // implement your code
-    protected function main(Options $options)
+    public function handle(): void
     {
-        $cmd = match ($options->getCmd()) {
-            "migration:create" => new MigrationCreate($this, $options->getArgs()),
-            "migration:run" => new MigrationRun($this, $options->getArgs()),
-            default => null
-        };
+        try {
+            db()->beginTransaction();
+            $this->cliHelper->info('Migration process start...');
 
-        if ($cmd instanceof Command) {
-            call_user_func([$cmd, 'handle']);
-        } else {
-            $this->warning('No command chosen');
-            echo $options->help();
+            $this->createMigrationTable();
+            $this->runMigrations();
+
+            if (db()->inTransaction()) {
+                db()->commit();
+            }
+
+            $this->cliHelper->info('Migration process is finished!');
+        } catch (PDOException $exception) {
+            if (db()->inTransaction()) {
+                db()->rollBack();
+            }
+            $this->cliHelper->fatal($exception->getMessage(), $exception->getTrace());
         }
     }
-}
 
-$cli = new CliHelper();
-$cli->run();
+    protected function runMigrations(): void
+    {
+        $this->cliHelper->info('');
+        $this->cliHelper->info('Fetch migrations..');
+
+        $migrations = scandir(static::MIGRATIONS_DIR);
+        $migrations = array_values(array_diff(
+            $migrations,
+            ['.', '..']
+        ));
+
+        $this->cliHelper->notice(json_encode($migrations));
+
+        $handledMigrations = $this->getHandledMigrations();
+
+        $this->cliHelper->notice(json_encode($handledMigrations));
+
+        if (!empty($migrations)) {
+            foreach ($migrations as $migration) {
+                $this->cliHelper->notice("- run `$migration`");
+                if (in_array($migration, $handledMigrations)) {
+                    $this->cliHelper->notice("-- skip `$migration`");
+                    continue;
+                }
+
+                $sql = file_get_contents(static::MIGRATIONS_DIR . "/$migration");
+                $query = db()->prepare($sql);
+
+                if ($query->execute()) {
+                    $this->createMigrationRecord($migration);
+                    $this->cliHelper->success("- `$migration` migrated");
+                }
+            }
+        }
+    }
+
+    protected function createMigrationRecord(string $migration): void
+    {
+        $query = db()->prepare("INSERT INTO migrations (name) VALUES (:name)");
+        $query->bindParam('name', $migration);
+        $query->execute();
+    }
+
+    protected function getHandledMigrations(): array
+    {
+        $query = db()->prepare('SELECT name FROM migrations');
+        $query->execute();
+
+        return array_map(fn($item) => $item['name'], $query->fetchAll());
+    }
+
+    protected function createMigrationTable(): void
+    {
+        $this->cliHelper->info('- Run migration table query');
+
+        $query = db()->prepare("
+            CREATE TABLE IF NOT EXISTS migrations (
+                id INT(8) UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+                name VARCHAR(255) NOT NULL UNIQUE
+            )"
+        );
+
+        if (!$query->execute()) {
+            throw new Exception("Smth went wrong with migration table query");
+        }
+
+        $this->cliHelper->success('- Migrations table was created!');
+    }
+}
