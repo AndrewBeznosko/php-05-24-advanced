@@ -6,12 +6,9 @@ use Core\Model;
 
 class Folder extends Model
 {
-    public int $user_id;
-    public string $title, $created_at, $updated_at;
-    public ?string $deleted_at = null;
+    protected static ?string $tableName = 'folders';
 
-    protected function table(): string
-    {
-        return 'folders';
-    }
+    public ?int $user_id;
+    public string $title;
+    public ?string $created_at, $updated_at;
 }

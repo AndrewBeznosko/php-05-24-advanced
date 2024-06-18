@@ -3,7 +3,6 @@
 namespace Core;
 
 use Core\Traits\Queryable;
-use ReflectionClass;
 
 abstract class Model
 {
@@ -11,15 +10,19 @@ abstract class Model
 
     public int $id;
 
-    puclic function toArray(): array
+    public function toArray(): array
     {
         $data = [];
 
-        $reflection = new ReflectionClass($this);
-        $props = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);
+        $reflect = new \ReflectionClass($this);
+        $props = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC);
         $vars = (array) $this;
 
-        foreach ($props as $prop) {
+        foreach($props as $prop) {
+            if (in_array($prop->getName(), ['commands', 'tableName'])) {
+                continue;
+            }
+
             $data[$prop->getName()] = $vars[$prop->getName()] ?? null;
         }
 

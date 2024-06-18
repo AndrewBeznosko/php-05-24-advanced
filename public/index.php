@@ -9,12 +9,33 @@ define('BASE_DIR', dirname(__DIR__));
 require_once BASE_DIR . '/vendor/autoload.php';
 
 try {
-    $dotenv = Dotenv::createImmutable(BASE_DIR);
+    $dotenv = Dotenv::createUnsafeImmutable(BASE_DIR);
     $dotenv->load();
 
-    die(Router::getInstance()->dispatch());
-} catch (Throwable $e) {
-//    die(jsonResponse(Status::getBaseCode($e->getCode()), ['errors' => ['message' => $e->getMessage()]]));
-    $status = Status::getBaseCode($e->getCode());
-    die(jsonResponse($status, ['errors' => ['message' => $e->getMessage()]]));
+    die(Router::dispatch($_SERVER['REQUEST_URI']));
+} catch (PDOException $exception) {
+    die(
+    jsonResponse(
+        Status::UNPROCESSABLE_ENTITY,
+        [
+            'errors' => [
+                'message' => $exception->getMessage(),
+                'trace' => $exception->getTrace()
+            ]
+        ]
+    )
+    );
+} catch (Throwable $exception) {
+    dd($exception);
+    die(
+    jsonResponse(
+        Status::from($exception->getCode()),
+        [
+            'errors' => [
+                'message' => $exception->getMessage(),
+                'trace' => $exception->getTrace()
+            ]
+        ]
+    )
+    );
 }

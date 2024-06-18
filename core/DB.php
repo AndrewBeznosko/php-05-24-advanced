@@ -10,14 +10,21 @@ class DB
 
     static public function connect(): PDO
     {
-        if (self::$instance === null) {
-            self::$instance = new PDO(
-                'mysql:host=' . getenv('DB_HOST') . ';dbname=' . getenv('php_05_advanced'),
+        if (is_null(static::$instance)) {
+            $dsn = 'mysql:host='. getenv('DB_HOST') .';dbname=' . getenv('DB_NAME');
+            $options = [
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+            ];
+
+            static::$instance = new PDO(
+                $dsn,
                 getenv('DB_USER'),
-                getenv('DB_PASSWORD')
+                getenv('DB_PASSWORD'),
+                $options
             );
         }
 
-        return self::$instance;
+        return static::$instance;
     }
 }

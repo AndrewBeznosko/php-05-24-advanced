@@ -1,12 +1,9 @@
 FROM php:8.3-apache
 
-RUN pecl install xdebug-3.3.2 \
-    && docker-php-ext-enable xdebug
 
 RUN docker-php-ext-install -j$(nproc) pdo_mysql
 
-RUN apt-get update && apt-get install -y \
-    git
+RUN apt-get update && apt-get upgrade -y && apt-get install -y git
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
