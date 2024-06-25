@@ -24,7 +24,6 @@ class UpdateNoteValidator extends Base
             static::isNoteExists($fields['id']),
             parent::validate($fields),
             static::validateFolderId($fields['folder_id']),
-            !static::checkTitleOnDuplicate($fields['title'], $fields['folder_id']),
             static::isBoolean($fields, 'pinned'),
             static::isBoolean($fields, 'completed')
         ];

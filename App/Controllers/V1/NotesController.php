@@ -59,7 +59,7 @@ class NotesController extends BaseApiController
             'updated_at' => date('Y-m-d H:i:s')
         ];
 
-        if (UpdateNoteValidator::validate($fields) && $Note = $this->model->update($updateFields)) {
+        if (UpdateNoteValidator::validate([...$fields, 'id' => $id]) && $Note = $this->model->update($updateFields)) {
             return $this->response(Status::OK, $Note->toArray());
         }
 
