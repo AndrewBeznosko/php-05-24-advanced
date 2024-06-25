@@ -11,6 +11,7 @@ use ReflectionMethod;
 class Router
 {
     use HttpMethods;
+
     protected static Router|null $instance = null;
 
     protected array $routes = [], $params = [];
@@ -50,7 +51,7 @@ class Router
     static protected function setUri(string $uri): static
     {
         $uri = preg_replace('/\//', '\\/', $uri);
-        $uri = preg_replace('/\{([a-z_-]+):([^}]+)}/', '(?P<$1>$2)', $uri);
+        $uri = preg_replace('/\{([a-zA-Z_-]+):([^}]+)}/', '(?P<$1>$2)', $uri);
         $uri = "/^$uri$/i";
 
         $router = static::getInstance();
@@ -155,7 +156,7 @@ class Router
         if (!empty($types)) {
             $lastKey = array_key_last($types);
             $step = 0;
-            $types[$lastKey] = array_map(fn ($value) => str_replace('+', '', $value), $types[$lastKey]);
+            $types[$lastKey] = array_map(fn($value) => str_replace('+', '', $value), $types[$lastKey]);
 
             foreach ($uriParams as $key => $value) {
                 settype($value, $this->convertTypes[$types[$lastKey][$step]]);
