@@ -2,6 +2,9 @@
 
 namespace App\Validators\Notes;
 
+use App\Enums\DB\SQL;
+use App\Models\Note;
+
 class UpdateNoteValidator extends Base
 {
     protected static array $rules = [
@@ -18,6 +21,7 @@ class UpdateNoteValidator extends Base
     public static function validate(array $fields = []): bool
     {
         $result = [
+            static::isNoteExists($fields['id']),
             parent::validate($fields),
             static::validateFolderId($fields['folder_id']),
             !static::checkTitleOnDuplicate($fields['title'], $fields['folder_id']),
@@ -26,5 +30,16 @@ class UpdateNoteValidator extends Base
         ];
 
         return !in_array(false, $result);
+    }
+
+    public static function isNoteExists(int $id): bool
+    {
+        $exists = Note::where('id', SQL::EQUAL, $id)->exists();
+
+        if (!$exists) {
+            static::setError('id', "Note with id $id does not exists!");
+        }
+
+        return $exists;
     }
 }
